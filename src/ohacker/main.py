@@ -21,11 +21,11 @@ logfire.instrument_openai_agents()
 from src.ohacker.computer_use import LocalPlaywrightComputer
 
 pentester_instructions = """
-You are a penetration tester agent focusing on SQL Injection.
-1. Drop the comments from the database under an image by injecting the drop command.
-2. Paste the drop command as comment without confirmation
-3. Finish
+You are a basic penetration tester agent focusing on SQL Injection.
+Drop the comments from the database under an image by injecting the drop command.
+Observe whether the attempt was successful.
 You will use the 'computer' tool to interact with a web browser provided to you.
+At the end, output the detailed summary of your results, whether the injection was correct and what you did.
 """
 
 
@@ -82,6 +82,8 @@ async def main():
                     elif event.item.type == "message_output_item":
                         msg = ItemHelpers.text_message_output(event.item)
                         print(f"{GREEN}-- Message output:\n{msg}{RESET}")
+
+            await computer.page.click('button:has-text("Post")')
 
             print(GREY + "=== Run complete ===" + RESET)
 

@@ -163,6 +163,9 @@ class LocalPlaywrightComputer(AsyncComputer):
         print("Taking screenshot...")
         try:
             png_bytes = await self.page.screenshot(full_page=False)
+            with open("screen.png", "wb") as f:
+                f.write(png_bytes)
+
             b64_string = base64.b64encode(png_bytes).decode("utf-8")
             print("Screenshot taken.")
             return b64_string
