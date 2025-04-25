@@ -50,7 +50,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                 <User size={16} className="text-neutral-400" />
               </div>
             )}
-            <div className="flex flex-col rounded-xl px-3 py-1.5 bg-gray-50 border border-gray-200 group-hover:bg-neutral-100 group-hover:text-neutral-900 transition shadow max-w-xs md:max-w-sm text-neutral-900">
+            <div className="flex flex-col rounded-xl px-3 py-1.5 bg-gray-50 border border-gray-200 group-hover:bg-neutral-100 group-hover:text-neutral-900 transition max-w-xs md:max-w-sm text-neutral-900">
               <span className="font-semibold text-xs text-neutral-800">{c.user.name}</span>
               <span className="text-[0.97em]">{c.text}</span>
             </div>

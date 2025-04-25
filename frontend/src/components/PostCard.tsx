@@ -30,7 +30,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onAddComment }) => {
     <div className="bg-white/90 mb-4 max-w-[465px] w-full mx-auto border border-gray-200"> {/* mb-4 replaces mb-8 for less space; no rounded classes */}
       <div className="flex items-center gap-3 px-5 pt-4">
         {post.user.avatar ? (
-          <img src={post.user.avatar} alt={post.user.name} className="w-10 h-10 border border-gray-200 object-cover shadow-sm" />
+          <img src={post.user.avatar} alt={post.user.name} className="w-10 h-10 rounded-full border-gray-200 object-cover shadow-sm" />
         ) : (
           <span className="w-10 h-10 bg-white border border-gray-200 flex items-center justify-center">
             <User className="text-neutral-400" size={22} />

@@ -1,8 +1,8 @@
 
 export const MOCK_USER = {
   id: 1,
-  name: "Jane Doe",
-  avatar: "https://randomuser.me/api/portraits/women/68.jpg",
+  name: "Michał",
+  avatar: "https://avatars.githubusercontent.com/u/47692610?v=4",
 };
 
 export const DUMMY_POSTS = [
