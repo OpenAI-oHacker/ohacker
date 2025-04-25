@@ -25,11 +25,11 @@ const Index: React.FC = () => {
   React.useEffect(() => {
     const fetchFeed = async () => {
       try {
-        const images_response = await fetch('http://localhost:8001/images');          
+        const images_response = await fetch('http://127.0.0.1:8001/images');
         const images_data = await images_response.json();
 
         const comments_promises = images_data.images.map(image => 
-          fetch(`http://localhost:8001/comments/${image}`)
+          fetch(`http://127.0.0.1:8001/comments/${image}`)
             .then(response => response.json())
             .then(response => response.comments.map(comment => ({
               id: Date.now(),
@@ -42,7 +42,7 @@ const Index: React.FC = () => {
         setPosts(images_data.images.map((image, index) => ({
           id: image,
           user: getRandomUser(),
-          image: `http://localhost:8001/images/${image}`,
+          image: `http://127.0.0.1:8001/images/${image}`,
           caption: "",
           comments: comments_data[index] || [],
         }))); 
@@ -58,7 +58,7 @@ const Index: React.FC = () => {
     const formData = new FormData();
     formData.append("base64_image", post.image);
     formData.append("caption", post.caption);
-    const response = await fetch("http://localhost:8001/images", {
+    const response = await fetch("http://127.0.0.1:8001/images", {
       method: "POST",
       body: formData
     })
@@ -66,7 +66,7 @@ const Index: React.FC = () => {
   };
 
   const handleAddComment = async (postId: number, text: string) => {
-    const response = await fetch(`http://localhost:8001/comments/${postId}`, {
+    const response = await fetch(`http://127.0.0.1:8001/comments/${postId}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
