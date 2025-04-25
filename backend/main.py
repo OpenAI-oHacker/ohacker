@@ -160,7 +160,7 @@ async def get_image(image_name: str = Path(...)):
     # Construct the potentially vulnerable file path relative to the app's root.
     # WARNING: This is highly insecure and for demonstration purposes only.
     # It allows reading files from anywhere the server process has permissions to read.
-    vulnerable_path = os.path.abspath(os.path.join(".", image_name))  # Path relative to CWD
+    vulnerable_path = os.path.abspath(os.path.join(".",  UPLOAD_FOLDER, image_name))  # Path relative to CWD
 
     # DEBUG: Print the path being accessed
     print(f"Attempting to access LFI path: {vulnerable_path}")
