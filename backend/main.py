@@ -1,7 +1,10 @@
+import base64
 import os
 import sqlite3
 import shutil
-from fastapi import FastAPI, File, UploadFile, HTTPException, Request, Path
+import uuid
+
+from fastapi import FastAPI, File, UploadFile, HTTPException, Request, Path, Form
 from fastapi.responses import JSONResponse, Response, FileResponse
 from fastapi.staticfiles import StaticFiles # Only for potentially serving safe files if needed, not used for the vulnerable endpoint
 from pydantic import BaseModel
@@ -74,39 +77,52 @@ async def index():
 # --- Image Endpoints ---
 
 @app.post("/images", status_code=201)
-async def upload_image(file: UploadFile = File(...)):
-    """
-    Handles image uploads.
-    VULNERABILITY: Unsafe File Upload.
-    Does not properly validate file types or sanitize filenames.
-    Allows uploading potentially malicious files (e.g., .php, .html, .sh).
-    """
-    if not file:
-        raise HTTPException(status_code=400, detail="No file part")
-    if file.filename == '':
-        raise HTTPException(status_code=400, detail="No selected file")
+async def upload_base64_image(
+        base64_image: str = Form(...),
+        caption: str = Form(...)
+):
+    if not base64_image:
+        raise HTTPException(status_code=400, detail="No Base64 image provided.")
 
-    # VULNERABLE PART: No real validation or sanitization
-    # Directly use the client-provided filename.
-    filename = file.filename
-    # Construct the path. Note: This doesn't prevent path traversal *during saving*
-    # if the filename itself contains '../' etc. (e.g., '.._malicious.txt')
-    # os.path.join might normalize some paths, but the core issue is trusting filename.
-    file_path = os.path.join(UPLOAD_FOLDER, filename)
+    if not caption:
+        raise HTTPException(status_code=400, detail="Caption is required.")
 
     try:
-        # Save the file directly without checking extension or content.
-        # Use shutil.copyfileobj to handle the async UploadFile stream.
-        with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
+        # Extract header and encoded data
+        header, encoded = base64_image.split(",", 1) if "," in base64_image else ("", base64_image)
 
-        return {"message": f"File '{filename}' uploaded successfully (potentially unsafely!)"}
+        try:
+            file_data = base64.b64decode(encoded)
+        except Exception:
+            raise HTTPException(status_code=400, detail="Invalid Base64 encoding.")
+
+        # Determine file extension
+        extension = get_image_extension(header) or "png"
+        filename = f"{uuid.uuid4().hex}.{extension}"
+        file_path = os.path.join(UPLOAD_FOLDER, filename)
+
+        # Save the image
+        with open(file_path, "wb") as f:
+            f.write(file_data)
+
+        return {
+            "message": f"Image saved as '{filename}'.",
+            "filename": filename,
+            "caption": caption
+        }
+
     except Exception as e:
-        # Basic error handling
-        raise HTTPException(status_code=500, detail=f"Could not save file: {str(e)}")
-    finally:
-        # Ensure the file pointer is closed
-        await file.close()
+        raise HTTPException(status_code=500, detail=f"Failed to save image: {str(e)}")
+
+
+def get_image_extension(header: str):
+    if "image/jpeg" in header:
+        return "jpg"
+    if "image/png" in header:
+        return "png"
+    if "image/gif" in header:
+        return "gif"
+    return None
 
 @app.get("/images")
 async def list_images():
