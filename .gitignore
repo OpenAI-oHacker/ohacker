@@ -10,3 +10,8 @@ outputs/
 dist/
 
 node_modules/
+
+
+.env
+/uploads_fastapi/
+vulnerable_app_fastapi.db

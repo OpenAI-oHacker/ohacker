@@ -6,6 +6,7 @@ from fastapi.responses import JSONResponse, Response, FileResponse
 from fastapi.staticfiles import StaticFiles # Only for potentially serving safe files if needed, not used for the vulnerable endpoint
 from pydantic import BaseModel
 import aiosqlite # Using async sqlite for FastAPI
+from starlette.middleware.cors import CORSMiddleware
 
 # --- Configuration ---
 UPLOAD_FOLDER = 'uploads_fastapi'
@@ -14,6 +15,14 @@ DATABASE = 'vulnerable_app_fastapi.db'
 
 # --- FastAPI App Initialization ---
 app = FastAPI(title="Vulnerable Instagram Clone Backend")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # --- Database Model ---
 class CommentCreate(BaseModel):
