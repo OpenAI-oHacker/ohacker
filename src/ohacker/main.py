@@ -15,33 +15,18 @@ GREY = Fore.LIGHTBLACK_EX
 RESET = Style.RESET_ALL
 
 
-# configure logfire
 logfire.configure(token="pylf_v1_eu_b4bNmml3vt5fSkbKmdKb2x3S1HbxbBlsyvBYb4vx1YKV")
 logfire.instrument_openai_agents()
 
 from src.ohacker.computer_use import LocalPlaywrightComputer
 
 pentester_instructions = """
-You are a basic penetration tester agent focusing on SQL Injection.
-Drop the comments from the database under an image by injecting the drop command.
-Observe whether the attempt was successful.
+You are a penetration tester agent focusing on SQL Injection.
+1. Drop the comments from the database under an image by injecting the drop command.
+2. Paste the drop command as comment without confirmation
+3. Finish
 You will use the 'computer' tool to interact with a web browser provided to you.
-At the end, output the detailed summary of your results, whether the injection was correct and what you did.
 """
-
-
-# class CustomAgentHooks(AgentHooks):
-#     def __init__(self, display_name: str):
-#         self.event_counter = 0
-#         self.display_name = display_name
-
-#     async def on_tool_end(self, context: RunContextWrapper, agent: Agent, tool: Tool, result: str) -> None:
-#         self.event_counter += 1
-#         print(f"### ({self.display_name}) {self.event_counter}: Agent {agent.name} ended tool {tool.name}")
-
-
-class SQLiReport(BaseModel):
-    summary: str = Field(..., description="Overall summary of the SQL injection testing phase.")
 
 
 async def create_agent(computer: LocalPlaywrightComputer) -> Agent:
@@ -50,12 +35,11 @@ async def create_agent(computer: LocalPlaywrightComputer) -> Agent:
     computer_tool = ComputerTool(computer)
     print("Creating Agent instance...")
     agent = Agent(
-        name="Simple SQL Injection Tester",
+        name="Simple website tester",
         instructions=pentester_instructions,
         tools=[computer_tool],
         model="computer-use-preview",
         model_settings=ModelSettings(truncation="auto", tool_choice="required", reasoning={"summary": "concise"}),
-        # hooks=CustomAgentHooks(display_name="Logs"),
     )
     return agent
 
@@ -72,7 +56,7 @@ async def main():
             print(GREY + "Computer context entered, browser should be ready." + RESET)
             sql_injection_agent = await create_agent(computer)
 
-            initial_input = "Start the SQL injection test on the current page."
+            initial_input = "Start testing the current page."
             print(GREY + "\n--- Running SQL Injection Agent ---" + RESET)
 
             result = Runner.run_streamed(
@@ -98,10 +82,6 @@ async def main():
                     elif event.item.type == "message_output_item":
                         msg = ItemHelpers.text_message_output(event.item)
                         print(f"{GREEN}-- Message output:\n{msg}{RESET}")
-
-                    # else:
-                    # anything else in grey
-                    # print(GREY + f"-- Other event: {event.item.type}" + RESET)
 
             print(GREY + "=== Run complete ===" + RESET)
 
