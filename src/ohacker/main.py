@@ -4,10 +4,15 @@ import logfire
 from agents import Agent, ComputerTool, Runner, ModelSettings, enable_verbose_stdout_logging, ItemHelpers
 from agents import Agent, AgentHooks, RunContextWrapper, Runner, Tool, function_tool
 from pydantic import BaseModel, Field
+from colorama import init, Fore, Style
 # from loguru import logger
 
+init(autoreset=True)
 
-# enable_verbose_stdout_logging()
+BLUE = Fore.BLUE
+GREEN = Fore.GREEN
+GREY = Fore.LIGHTBLACK_EX
+RESET = Style.RESET_ALL
 
 
 # configure logfire
@@ -56,67 +61,53 @@ async def create_agent(computer: LocalPlaywrightComputer) -> Agent:
 
 
 async def main():
-    # target_url = "https://www.bing.com/"
-    # target_url = "http://127.0.0.1:8001/docs"
     target_url = "http://localhost:8080/"
-    print(f"--- Preparing to test target URL: {target_url} ---")
+    print(GREY + f"--- Preparing to test target URL: {target_url} ---" + RESET)
 
     computer = LocalPlaywrightComputer(target_url=target_url)
 
     try:
-        print("Entering computer context manager...")
+        print(GREY + "Entering computer context manager..." + RESET)
         async with computer:
-            print("Computer context entered, browser should be ready.")
+            print(GREY + "Computer context entered, browser should be ready." + RESET)
             sql_injection_agent = await create_agent(computer)
 
             initial_input = "Start the SQL injection test on the current page."
-            print("\n--- Running SQL Injection Agent ---")
+            print(GREY + "\n--- Running SQL Injection Agent ---" + RESET)
 
             result = Runner.run_streamed(
                 sql_injection_agent,
                 input=initial_input,
                 max_turns=20,
             )
-            print("=== Run starting ===")
+            print(GREY + "=== Run starting ===" + RESET)
 
             async for event in result.stream_events():
                 if event.type == "raw_response_event":
                     continue
+
                 elif event.type == "agent_updated_stream_event":
-                    print(f"Agent updated: {event.new_agent.name}")
+                    print(GREY + f"Agent updated: {event.new_agent.name}" + RESET)
                     continue
+
                 elif event.type == "run_item_stream_event":
                     if event.item.type == "reasoning_item":
-                        print(f"-- Reasoning: {event.item.raw_item.summary[0].text}")
+                        text = event.item.raw_item.summary[0].text
+                        print(f"{BLUE}-- Reasoning: {text}{RESET}")
+
                     elif event.item.type == "message_output_item":
-                        print(f"-- Message output:\n {ItemHelpers.text_message_output(event.item)}")
-                    else:
-                        pass
+                        msg = ItemHelpers.text_message_output(event.item)
+                        print(f"{GREEN}-- Message output:\n{msg}{RESET}")
 
-            print("=== Run complete ===")
+                    # else:
+                    # anything else in grey
+                    # print(GREY + f"-- Other event: {event.item.type}" + RESET)
 
-    except RuntimeError as e:
-        print(f"\nRuntime Error during agent run or setup: {e}")
+            print(GREY + "=== Run complete ===" + RESET)
+
     except Exception as e:
-        print(f"\nAn unexpected error occurred: {e}")
-        import traceback
-
-        traceback.print_exc()
-    finally:
-        print("Exiting main try block (cleanup handled by async with).")
+        print(Fore.RED + f"Error: {e}" + RESET)
 
 
 if __name__ == "__main__":
-    print("Starting script...")
-    try:
-        asyncio.run(main())
-    except KeyboardInterrupt:
-        print("\nExecution interrupted by user.")
-    finally:
-        print("Script finished.")
-
-
-# zadanie
-# to zrobił
-# wynik
-# raport z opisem
+    asyncio.run(main())
