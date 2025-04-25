@@ -1,0 +1,12 @@
+[project]
+name = "fun"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12.2"
+dependencies = [
+    "aiosqlite>=0.21.0",
+    "fastapi>=0.115.12",
+    "python-multipart>=0.0.20",
+    "uvicorn[standard]>=0.34.2",
+]
