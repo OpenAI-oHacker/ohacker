@@ -1,9 +1,30 @@
 
 export const MOCK_USER = {
   id: 1,
-  name: "Michał",
+  name: "Michał Pstrąg",
   avatar: "https://avatars.githubusercontent.com/u/47692610?v=4",
 };
+
+export const MOCK_USERS = [
+  {
+    name: "Alan Konarski",
+    avatar: "https://sloppy-joe-app.imgix.net/blog_images/img-3064a-jpg-m9oR.jpg?usm=20&usmrad=15&w=512&h=512",
+  }, {
+    name: "Eryk Mazuś",
+    avatar: "https://avatars.githubusercontent.com/u/21311210?v=4",
+  }, {
+    name: "Michał Pstrąg",
+    avatar: "https://avatars.githubusercontent.com/u/47692610?v=4",
+  }, 
+];
+
+export function getRandomUser() {
+  // Calculate a random index between 0 and the array length - 1
+  const randomIndex = Math.floor(Math.random() * MOCK_USERS.length);
+  
+  // Return the user at the random index
+  return MOCK_USERS[randomIndex];
+}
 
 export const DUMMY_POSTS = [
   {

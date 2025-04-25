@@ -39,12 +39,14 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onAddComment }) => {
         <span className="font-semibold text-neutral-800 text-base">{post.user.name}</span>
       </div>
       <div className="w-full flex justify-center mt-3">
+        <a href={post.image}>
         <img
           src={post.image}
           alt={post.caption}
           className="w-full h-[300px] md:h-[400px] object-cover border-t border-gray-200" // removed rounded-xl
           style={{ objectPosition: "center" }}
         />
+        </a>   
       </div>
       <div className="px-5 py-3">
         <p className="text-neutral-900 font-medium mb-2">{post.caption}</p>

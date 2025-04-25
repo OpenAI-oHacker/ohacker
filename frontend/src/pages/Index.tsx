@@ -3,7 +3,7 @@ import * as React from "react";
 import { Navbar } from "@/components/Navbar";
 import { PostCard } from "@/components/PostCard";
 import { PostForm } from "@/components/PostForm";
-import { DUMMY_POSTS, MOCK_USER } from "@/data/dummyData";
+import { DUMMY_POSTS, MOCK_USER, getRandomUser } from "@/data/dummyData";
 
 export type CommentType = {
   id: number;
@@ -19,19 +19,62 @@ export type PostType = {
 };
 
 const Index: React.FC = () => {
-  const [posts, setPosts] = React.useState<PostType[]>(() =>
-    DUMMY_POSTS.map((p) => ({
-      ...p,
-      comments: [...p.comments],
-    }))
-  );
+  const [posts, setPosts] = React.useState<PostType[]>([]);
   const [showPostForm, setShowPostForm] = React.useState(false);
 
-  const handleAddPost = (post: PostType) => {
+  React.useEffect(() => {
+    const fetchFeed = async () => {
+      try {
+        const images_response = await fetch('http://localhost:8001/images');          
+        const images_data = await images_response.json();
+
+        const comments_promises = images_data.images.map(image => 
+          fetch(`http://localhost:8001/comments/${image}`)
+            .then(response => response.json())
+            .then(response => response.comments.map(comment => ({
+              id: Date.now(),
+              user: getRandomUser(),
+              text: comment.comment_text,
+            })))
+        );
+        const comments_data = await Promise.all(comments_promises);
+        console.log(comments_data)
+        setPosts(images_data.images.map((image, index) => ({
+          id: image,
+          user: getRandomUser(),
+          image: `http://localhost:8001/images/${image}`,
+          caption: "",
+          comments: comments_data[index] || [],
+        }))); 
+      } catch (err) {
+        console.error('Error fetching feed:', err);
+      } 
+    };
+
+    fetchFeed();
+  }, []);
+
+  const handleAddPost = async (post: PostType) => {
+    const formData = new FormData();
+    formData.append("base64_image", post.image);
+    formData.append("caption", post.caption);
+    const response = await fetch("http://localhost:8001/images", {
+      method: "POST",
+      body: formData
+    })
     setPosts((prev) => [post, ...prev]);
   };
 
-  const handleAddComment = (postId: number, text: string) => {
+  const handleAddComment = async (postId: number, text: string) => {
+    const response = await fetch(`http://localhost:8001/comments/${postId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        comment_text: text,
+      })
+    })
     setPosts((prev) =>
       prev.map((p) =>
         p.id === postId
@@ -41,7 +84,7 @@ const Index: React.FC = () => {
                 ...p.comments,
                 {
                   id: Date.now(),
-                  user: MOCK_USER,
+                  user: getRandomUser(),
                   text,
                 },
               ],
