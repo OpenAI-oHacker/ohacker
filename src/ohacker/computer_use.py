@@ -50,8 +50,7 @@ class LocalPlaywrightComputer(AsyncComputer):
         self._playwright: Playwright | None = None
         self._browser: Browser | None = None
         self._page: Page | None = None
-        # Store the target URL provided during initialization
-        self._target_url: str = target_url  # Now set in init
+        self._target_url: str = target_url
 
     # _get_browser_and_page remains largely the same, uses self._target_url
     async def _get_browser_and_page(self) -> tuple[Browser, Page]:
