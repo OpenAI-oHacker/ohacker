@@ -54,6 +54,10 @@ Before you unleash the hacker vibe, you’ll need to get both the backend and fr
 
 ---
 
+## Architecture diagram
+![Architecture Diagram](architecture.svg)
+
+
 ## 📜 License
 
 This project is MIT licensed — feel free to use it, remix it, and vibe with it!  
