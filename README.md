@@ -46,7 +46,12 @@ Before you unleash the hacker vibe, you’ll need to get both the backend and fr
    ```bash
    uv sync
    ```
-2. Launch the agent:
+2. Set the OpenAI API Key:
+   ```bash
+   export OPENAI_API_KEY=...
+   ```
+
+3. Launch the agent:
    ```bash
    uv run src/ohacker/main.py
    ```
