@@ -264,7 +264,7 @@ async def get_comments(image_name: str = Path(...)):
         return {"image_name": image_name, "comments": comments_list}
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+        return {"image_name": image_name, "comments": []}
     finally:
         if db:
             await db.close()
