@@ -24,7 +24,7 @@ logfire.instrument_openai_agents()
 
 sqli_instructions = """
 You are a basic penetration tester agent focusing on SQL Injection.
-Drop the comments from the database under an image by injecting the drop command.
+Drop the comments from the database under an image by injecting the drop command: '); DROP TABLE comments; --'
 Observe whether the attempt was successful.
 You will use the 'computer' tool to interact with a web browser provided to you.
 At the end, output the detailed summary of your results, whether the injection was correct and what you did.
@@ -120,47 +120,54 @@ async def main():
 
                 final_output_message = None
 
-                async for event in result.stream_events():
-                    if event.type == "raw_response_event":
-                        continue
+                try:
+                    async for event in result.stream_events():
+                        if event.type == "raw_response_event":
+                            continue
 
-                    elif event.type == "agent_updated_stream_event":
-                        # print(GREY + f"Agent updated: {event.new_agent.name}" + RESET)
-                        continue
+                        elif event.type == "agent_updated_stream_event":
+                            # print(GREY + f"Agent updated: {event.new_agent.name}" + RESET)
+                            continue
 
-                    elif event.type == "run_item_stream_event":
-                        item = event.item
-                        if item.type == "reasoning_item":
-                            # Check if summary exists and has text
-                            if item.raw_item and hasattr(item.raw_item, "summary") and item.raw_item.summary:
-                                text = item.raw_item.summary[0].text
-                                print(f"{BLUE}-- Reasoning: {text}{RESET}")
-                            else:
-                                print(f"{BLUE}-- Reasoning: (No summary provided){RESET}")
+                        elif event.type == "run_item_stream_event":
+                            item = event.item
+                            if item.type == "reasoning_item":
+                                # Check if summary exists and has text
+                                if item.raw_item and hasattr(item.raw_item, "summary") and item.raw_item.summary:
+                                    text = item.raw_item.summary[0].text
+                                    print(f"{BLUE}-- Reasoning: {text}{RESET}")
+                                else:
+                                    print(f"{BLUE}-- Reasoning: (No summary provided){RESET}")
 
-                        elif item.type == "message_output_item":
-                            msg = ItemHelpers.text_message_output(item)
-                            print(f"{GREEN}-- Message output:\n{msg}{RESET}")
-                            # Store the last message output as potential final output
-                            final_output_message = msg
+                            elif item.type == "message_output_item":
+                                msg = ItemHelpers.text_message_output(item)
+                                print(f"{GREEN}-- Message output:\n{msg}{RESET}")
+                                # Store the last message output as potential final output
+                                final_output_message = msg
 
-                        elif item.type == "tool_call_item":
-                            if isinstance(item.raw_item, ResponseComputerToolCall):
-                                action_name = item.raw_item.action
-                                print(f"{Fore.YELLOW}-- Tool Call: {action_name}{RESET}")
-                            else:
-                                tool_name = item.raw_item.name
-                                args = item.raw_item.arguments
-                                print(f"{Fore.YELLOW}-- Tool Call: {tool_name}(args={args}){RESET}")
+                            elif item.type == "tool_call_item":
+                                if isinstance(item.raw_item, ResponseComputerToolCall):
+                                    action_name = item.raw_item.action
+                                    print(f"{Fore.YELLOW}-- Tool Call: {action_name}{RESET}")
+                                else:
+                                    tool_name = item.raw_item.name
+                                    args = item.raw_item.arguments
+                                    print(f"{Fore.YELLOW}-- Tool Call: {tool_name}(args={args}){RESET}")
 
-                        elif item.type == "tool_output_item":
-                            output = item.raw_item.output
-                            print(
-                                f"{Fore.CYAN}-- Tool Output: {output[:200]}{'...' if len(output) > 200 else ''}{RESET}"
-                            )
+                            elif item.type == "tool_output_item":
+                                output = item.raw_item.output
+                                print(
+                                    f"{Fore.CYAN}-- Tool Output: {output[:200]}{'...' if len(output) > 200 else ''}{RESET}"
+                                )
+                except Exception as e:
+                    print("agent exception: {e}")
+                    pass
 
                 if agent_name == "Simple website tester 1.":
-                    await computer.page.click('button:has-text("Post")')
+                    await computer.page.get_by_role("button", name="Post", exact=True).first.click()
+                    await asyncio.sleep(5)
+                    await computer.page.reload(wait_until="domcontentloaded", timeout=15000)
+                    await asyncio.sleep(8)
 
                 print("*" * 66)
                 print(final_output_message)
@@ -177,7 +184,7 @@ async def main():
         summary += f"{i}. {NAMES[i]}:\n{msg}\n\n"
     query = f"The summary of the penetration testing agents results:\n{summary}"
 
-    report, code_patch = asyncio.gather(ResearchManager().run(query), run_patch_agent(query))
+    report, code_patch = await asyncio.gather(ResearchManager().run(query), run_patch_agent(query))
 
 
 if __name__ == "__main__":
