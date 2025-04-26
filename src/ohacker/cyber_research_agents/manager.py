@@ -2,11 +2,12 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import asyncio
 from agents import Runner, custom_span, gen_trace_id, trace
 
-from planner_agent import WebSearchItem, WebSearchPlan, planner_agent
-from search_agent import search_agent
-from writer_agent import ReportData, writer_agent
+from src.ohacker.cyber_research_agents.planner_agent import WebSearchItem, WebSearchPlan, planner_agent
+from src.ohacker.cyber_research_agents.search_agent import search_agent
+from src.ohacker.cyber_research_agents.writer_agent import ReportData, writer_agent
 
 
 class ResearchManager:

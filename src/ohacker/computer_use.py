@@ -159,14 +159,14 @@ class LocalPlaywrightComputer(AsyncComputer):
 
     # screenshot, click, double_click, scroll, type, wait, move, keypress, drag methods remain the same...
     async def screenshot(self) -> str:
-        print("Taking screenshot...")
+        # print("Taking screenshot...")
         try:
             png_bytes = await self.page.screenshot(full_page=False)
             with open("screen.png", "wb") as f:
                 f.write(png_bytes)
 
             b64_string = base64.b64encode(png_bytes).decode("utf-8")
-            print("Screenshot taken.")
+            # print("Screenshot taken.")
             return b64_string
         except Exception as e:
             print(f"Error taking screenshot: {e}")

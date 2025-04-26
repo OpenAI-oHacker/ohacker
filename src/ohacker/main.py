@@ -37,17 +37,19 @@ Your task is to:
 2.  Click on the identified image.
 3.  After clicking, observe the get current URL of the browser.
 4.  If the URL contains a parameter that seems to load content (like a file name), attempt to exploit it for LFI.
-5.  Construct a new URL by modifying that parameter using directory traversal (`../`) to try and access the file `images/secret.txt`. 
+5.  Construct a new URL by modifying that parameter to try and access the file `images/secrets.txt`. 
 6.  Navigate to this newly constructed URL using the computer tool.
-7.  Observe the page content after navigating. Check if the contents of `/secret.txt` are displayed.
+7.  Observe the page content after navigating. Check if the contents of `/secrets.txt` are displayed.
 8.  Provide a detailed summary of your steps: which image you clicked, the URL observed after clicking, the LFI payload URL you constructed and navigated to, and whether you successfully retrieved the contents of `/secret.txt`.
 """
 
 AGENTS = {
     "Simple website tester 1.": sqli_instructions,
-    "Simple website tester 2.": lfi_instructions,
+    # "Simple website tester 2.": lfi_instructions,
     # "File upload tester": fileupload_instructions,
 }
+
+NAMES = ["SQL Injection Agent", "LFI Agent"]
 
 
 async def create_agent(name: str, tools: list[Any]) -> Agent:
@@ -70,6 +72,7 @@ async def create_agent(name: str, tools: list[Any]) -> Agent:
 async def main():
     target_url = "http://localhost:8080/"
     print(f"--- URL: {target_url} ---")
+    final_output_messages = list()
 
     try:
         for agent_name in AGENTS.keys():
@@ -160,9 +163,8 @@ async def main():
                     await computer.page.click('button:has-text("Post")')
 
                 print("*" * 66)
-                print(final_output_message)  # todo: store in list
-
-            # The 'async with computer' block ensures computer cleanup here
+                print(final_output_message)
+                final_output_messages.append(final_output_message)
 
     except Exception as e:
         print(Fore.RED + f"An error occurred in main: {e}" + RESET)
@@ -170,10 +172,11 @@ async def main():
 
         traceback.print_exc()
 
-    #TODO ERYK
-    query = query = ("Short summary of the findings: \n\n"
-             "1. Found a SQL injection vulnerability in the login form.\n"
-             "2. Found a local file inclusion (LFI) vulnerability in the file upload feature.\n")
+    summary = ""
+    for i, msg in enumerate(final_output_messages):
+        summary += f"{i}. {NAMES[i]}:\n{msg}\n\n"
+    query = f"The summary of the penetration testing agents results:\n{summary}"
+
     report, code_patch = asyncio.gather(ResearchManager().run(query), run_patch_agent(query))
 
 
