@@ -18,7 +18,7 @@ GREY = Fore.LIGHTBLACK_EX
 RESET = Style.RESET_ALL
 
 
-logfire.configure(token="pylf_v1_eu_b4bNmml3vt5fSkbKmdKb2x3S1HbxbBlsyvBYb4vx1YKV")
+logfire.configure(token=os.getenv("LOGFIRE_TOKEN"))
 logfire.instrument_openai_agents()
 
 
