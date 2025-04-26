@@ -6,6 +6,7 @@ from agents import Agent, ComputerTool, Runner, ModelSettings, ItemHelpers
 from agents import Agent, Runner, function_tool
 from colorama import init, Fore, Style
 
+from src.ohacker.security_patches_agent import run_patch_agent
 from src.ohacker.cyber_research_agents.manager import ResearchManager
 from src.ohacker.computer_use import LocalPlaywrightComputer
 
@@ -169,13 +170,11 @@ async def main():
 
         traceback.print_exc()
 
-    # TODO ERYK
-    query = query = (
-        "Short summary of the findings: \n\n"
-        "1. Found a SQL injection vulnerability in the login form.\n"
-        "2. Found a local file inclusion (LFI) vulnerability in the file upload feature.\n"
-    )
-    await ResearchManager().run(query)
+    #TODO ERYK
+    query = query = ("Short summary of the findings: \n\n"
+             "1. Found a SQL injection vulnerability in the login form.\n"
+             "2. Found a local file inclusion (LFI) vulnerability in the file upload feature.\n")
+    report, code_patch = asyncio.gather(ResearchManager().run(query), run_patch_agent(query))
 
 
 if __name__ == "__main__":
