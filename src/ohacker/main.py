@@ -61,6 +61,7 @@ async def create_agent(name: str, tools: list[Any]) -> Agent:
         tools=tools,
         model="computer-use-preview",
         model_settings=ModelSettings(
+            temperature=0.1,
             truncation="auto",
             tool_choice="auto",
             reasoning={"summary": "concise"},
@@ -164,6 +165,10 @@ async def main():
                     pass
 
                 if agent_name == "Simple website tester 1.":
+                    await asyncio.sleep(2)
+                    await computer.page.goto(target_url, wait_until="domcontentloaded", timeout=60000)
+
+                if agent_name == "Simple website tester 2.":
                     await computer.page.get_by_role("button", name="Post", exact=True).first.click()
                     await asyncio.sleep(5)
                     await computer.page.reload(wait_until="domcontentloaded", timeout=15000)
