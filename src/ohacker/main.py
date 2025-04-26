@@ -5,7 +5,10 @@ from agents import Agent, ComputerTool, Runner, ModelSettings, enable_verbose_st
 from agents import Agent, AgentHooks, RunContextWrapper, Runner, Tool, function_tool
 from pydantic import BaseModel, Field
 from colorama import init, Fore, Style
+
+from src.ohacker.cyber_research_agents.manager import ResearchManager
 # from loguru import logger
+from src.ohacker.computer_use import LocalPlaywrightComputer
 
 init(autoreset=True)
 
@@ -18,7 +21,6 @@ RESET = Style.RESET_ALL
 logfire.configure(token="pylf_v1_eu_b4bNmml3vt5fSkbKmdKb2x3S1HbxbBlsyvBYb4vx1YKV")
 logfire.instrument_openai_agents()
 
-from src.ohacker.computer_use import LocalPlaywrightComputer
 
 pentester_instructions = """
 You are a basic penetration tester agent focusing on SQL Injection.
@@ -36,18 +38,9 @@ Click on the images to see if they are clickable. What does current url tell you
 Observe whether the contents of the file are displayed in the browser's response.
 """
 
-fileupload_instructions = """
-You are a basic penetration tester agent focusing on SQL Injection.
-Drop the comments from the database under an image by injecting the drop command.
-Observe whether the attempt was successful.
-You will use the 'computer' tool to interact with a web browser provided to you.
-At the end, output the detailed summary of your results, whether the injection was correct and what you did.
-"""
-
 AGENTS = {
     "Simple website tester": pentester_instructions,
     "LFI tester": lfi_instructions,
-    # "File upload tester": fileupload_instructions,
 }
 
 class GoToPageTool:
@@ -120,6 +113,13 @@ async def main():
 
     except Exception as e:
         print(Fore.RED + f"Error: {e}" + RESET)
+
+    #TODO ERYK
+    query = query = ("Short summary of the findings: \n\n"
+             "1. Found a SQL injection vulnerability in the login form.\n"
+             "2. Found a local file inclusion (LFI) vulnerability in the file upload feature.\n")
+    await ResearchManager().run(query)
+
 
 
 if __name__ == "__main__":
