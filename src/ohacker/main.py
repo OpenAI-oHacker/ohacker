@@ -169,6 +169,9 @@ async def main():
                     await computer.page.goto(target_url, wait_until="domcontentloaded", timeout=60000)
 
                 if agent_name == "Simple website tester 2.":
+                    print(
+                        f"{Fore.YELLOW}-- Tool Call: ActionClick(button='left', type='click', x=725.123, y=713.5633){RESET}"
+                    )
                     await computer.page.get_by_role("button", name="Post", exact=True).first.click()
                     await asyncio.sleep(5)
                     await computer.page.reload(wait_until="domcontentloaded", timeout=15000)
