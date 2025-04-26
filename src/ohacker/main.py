@@ -1,14 +1,15 @@
-from typing import Any
 import asyncio
-import logfire
-from openai.types.responses.response_computer_tool_call import ResponseComputerToolCall
-from agents import Agent, ComputerTool, Runner, ModelSettings, ItemHelpers
-from agents import Agent, Runner, function_tool
-from colorama import init, Fore, Style
+from typing import Any
 
-from src.ohacker.security_patches_agent import run_patch_agent
-from src.ohacker.cyber_research_agents.manager import ResearchManager
+import logfire
+from agents import Agent, Runner, function_tool
+from agents import ComputerTool, ModelSettings, ItemHelpers
+from colorama import init, Fore, Style
+from openai.types.responses.response_computer_tool_call import ResponseComputerToolCall
+
 from src.ohacker.computer_use import LocalPlaywrightComputer
+from src.ohacker.cyber_research_agents.manager import ResearchManager
+from src.ohacker.security_patches_agent import run_patch_agent
 
 init(autoreset=True)
 
@@ -17,10 +18,8 @@ GREEN = Fore.GREEN
 GREY = Fore.LIGHTBLACK_EX
 RESET = Style.RESET_ALL
 
-
 logfire.configure(token=os.getenv("LOGFIRE_TOKEN"))
 logfire.instrument_openai_agents()
-
 
 sqli_instructions = """
 You are a basic penetration tester agent focusing on SQL Injection.
@@ -46,7 +45,6 @@ Your task is to:
 AGENTS = {
     "Simple website tester 1.": lfi_instructions,
     "Simple website tester 2.": sqli_instructions,
-    # "File upload tester": fileupload_instructions,
 }
 
 NAMES = ["LFI Agent", "SQL Injection Agent"]

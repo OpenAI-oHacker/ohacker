@@ -1,8 +1,7 @@
 from pathlib import Path
 
-from pydantic import BaseModel
-
 from agents import Agent, Runner
+from pydantic import BaseModel
 
 PROMPT = (
     "You are a senior cybersecurity expert tasked with fixing Python code that has security vulnerabilities."
@@ -25,6 +24,7 @@ patch_agent = Agent(
     output_type=SecurityPatch,
 )
 
+
 async def run_patch_agent(description: str) -> SecurityPatch:
     code_path = Path(__file__).parent.parent.parent / "backend" / "main.py"
     code = code_path.read_text()
@@ -38,4 +38,3 @@ async def run_patch_agent(description: str) -> SecurityPatch:
     print(r.description)
     print(r.python_code)
     return r
-
