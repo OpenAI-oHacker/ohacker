@@ -44,12 +44,12 @@ Your task is to:
 """
 
 AGENTS = {
-    "Simple website tester 1.": sqli_instructions,
-    # "Simple website tester 2.": lfi_instructions,
+    "Simple website tester 1.": lfi_instructions,
+    "Simple website tester 2.": sqli_instructions,
     # "File upload tester": fileupload_instructions,
 }
 
-NAMES = ["SQL Injection Agent", "LFI Agent"]
+NAMES = ["LFI Agent", "SQL Injection Agent"]
 
 
 async def create_agent(name: str, tools: list[Any]) -> Agent:
